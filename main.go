@@ -15,5 +15,5 @@ func main() {
     v1.PUT("/:id", updateTodo)
     v1.DELETE("/:id", deleteTodo)
   }
-  router.Run()
+  router.Run(":8082")
 }
