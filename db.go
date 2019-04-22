@@ -19,5 +19,5 @@ func init() {
   }
 
   // Migrate the schema
-  // db.autoMigrate(&todoModel{})
+  db.AutoMigrate(&todoModel{})
 }
