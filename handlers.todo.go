@@ -1,14 +1,16 @@
 package main
 
 import (
-  "strconv"
   "github.com/gin-gonic/gin"
   "net/http"
 )
 
 func createTodo(c *gin.Context) {
-  completed, _ := strconv.Atoi(c.PostForm("completed"))
-  todo := todoModel{Title: c.PostForm("title"), Completed: completed}
+  var todo todoModel
+  if err := c.ShouldBindJSON(&todo); err != nil {
+    c.JSON(http.StatusBadRequest, gin.H {"error": err.Error()})
+    return
+  }
   db.Save(&todo)
   c.JSON(http.StatusCreated,
     gin.H{"status": http.StatusCreated, "message": "Todo item created successfully!", "resourceId": todo.ID},
@@ -52,9 +54,14 @@ func updateTodo(c *gin.Context) {
     return
   }
 
-  db.Model(&todo).Update("title", c.PostForm("title"))
-  completed, _ := strconv.Atoi(c.PostForm("completed"))
-  db.Model(&todo).Update("completed", completed)
+  var todoJson todoModel
+  if err := c.ShouldBindJSON(&todoJson); err != nil {
+    c.JSON(http.StatusBadRequest, gin.H {"error": err.Error()})
+    return
+  }
+
+  db.Model(&todo).Update("title", todoJson.Title)
+  db.Model(&todo).Update("completed", todoJson.Completed)
   c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "message": "Todo updated successfully!"})
 }
 
